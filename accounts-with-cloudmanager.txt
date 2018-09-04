@@ -1,0 +1,5 @@
+# All these accounts must have an AccessRole
+# After running the included python script, they will have an cloudpartners-cloudmanager role too
+
+# AccountID AccountAlias AccessRole
+

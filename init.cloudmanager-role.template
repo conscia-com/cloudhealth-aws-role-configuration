@@ -1,0 +1,140 @@
+provider "aws" {
+  alias = "ACCOUNT-NAME-cloudmanager"
+  region = "eu-west-1"
+  assume_role {
+    external_id = "terraform"
+    session_name = "LandingZone"
+    role_arn = "arn:aws:iam::ACCOUNT-ID:role/ACCESS-ROLE"
+  }
+}
+
+resource "aws_iam_role" "ACCOUNT-NAME-cloudmanager-role" {
+  provider = "aws.ACCOUNT-NAME-cloudmanager"
+  name = "cloudpartners-cloudmanager"
+  description = "CloudManager uses this role in the provider.tf to access resources on the account. CloudHealth tech can take this role"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": [
+          "arn:aws:iam::454464851268:root"
+        ]
+      },
+      "Action": "sts:AssumeRole",
+      "Condition": {
+        "StringEquals": {
+          "sts:ExternalId": "a9cfbe77a810dcd920410f496685ef"
+        }
+      }
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "ACCOUNT-NAME-cloudmanager_policy" {
+  provider = "aws.ACCOUNT-NAME-cloudmanager"
+  name        = "cloudpartners-cloudmanager"
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "autoscaling:Describe*",
+                "aws-portal:ViewBilling",
+                "aws-portal:ViewUsage",
+                "cloudformation:ListStacks",
+                "cloudformation:ListStackResources",
+                "cloudformation:DescribeStacks",
+                "cloudformation:DescribeStackEvents",
+                "cloudformation:DescribeStackResources",
+                "cloudformation:GetTemplate",
+                "cloudfront:Get*",
+                "cloudfront:List*",
+                "cloudtrail:DescribeTrails",
+                "cloudtrail:ListTags",
+                "cloudwatch:Describe*",
+                "cloudwatch:Get*",
+                "cloudwatch:List*",
+                "config:Get*",
+                "config:Describe*",
+                "config:Deliver*",
+                "config:List*",
+                "cur:Describe*",
+                "dms:Describe*",
+                "dms:List*",
+                "dynamodb:DescribeTable",
+                "dynamodb:List*",
+                "ec2:Describe*",
+                "ec2:GetReservedInstancesExchangeQuote",
+                "ecs:List*",
+                "ecs:Describe*",
+                "elasticache:Describe*",
+                "elasticache:ListTagsForResource",
+                "elasticbeanstalk:Check*",
+                "elasticbeanstalk:Describe*",
+                "elasticbeanstalk:List*",
+                "elasticbeanstalk:RequestEnvironmentInfo",
+                "elasticbeanstalk:RetrieveEnvironmentInfo",
+                "elasticfilesystem:Describe*",
+                "elasticloadbalancing:Describe*",
+                "elasticmapreduce:Describe*",
+                "elasticmapreduce:List*",
+                "es:List*",
+                "es:Describe*",
+                "firehose:ListDeliveryStreams",
+                "firehose:DescribeDeliveryStream",
+                "iam:List*",
+                "iam:Get*",
+                "iam:GenerateCredentialReport",
+                "kinesis:Describe*",
+                "kinesis:List*",
+                "kms:DescribeKey",
+                "kms:GetKeyRotationStatus",
+                "kms:ListKeys",
+                "lambda:List*",
+                "redshift:Describe*",
+                "route53:Get*",
+                "route53:List*",
+                "rds:Describe*",
+                "rds:ListTagsForResource",
+                "s3:GetBucketAcl",
+                "s3:GetBucketLocation",
+                "s3:GetBucketLogging",
+                "s3:GetBucketPolicy",
+                "s3:GetBucketTagging",
+                "s3:GetBucketVersioning",
+                "s3:GetBucketWebsite",
+                "s3:List*",
+                "sagemaker:Describe*",
+                "sagemaker:List*",
+                "sdb:GetAttributes",
+                "sdb:List*",
+                "ses:Get*",
+                "ses:List*",
+                "sns:Get*",
+                "sns:List*",
+                "sqs:GetQueueAttributes",
+                "sqs:ListQueues",
+                "storagegateway:List*",
+                "storagegateway:Describe*",
+                "workspaces:Describe*"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "ACCOUNT-NAME-cloudmanager-source-attach" {
+  provider = "aws.ACCOUNT-NAME-cloudmanager"
+  role       = "${aws_iam_role.ACCOUNT-NAME-cloudmanager-role.name}"
+  policy_arn = "${aws_iam_policy.ACCOUNT-NAME-cloudmanager_policy.arn}"
+}
+
